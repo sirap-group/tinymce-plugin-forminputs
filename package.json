@@ -1,5 +1,5 @@
 {
-  "name": "forminputs",
+  "name": "tinymce-plugin-forminputs",
   "version": "0.1.0",
   "description": "A plugin for tinymce WYSIWYG HTML editor that allow to insert editable HTML form inputs.",
   "main": "plugin.js",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com:rbecheras/forminputs.git"
+    "url": "git+https://github.com:rbecheras/tinymce-plugin-forminputs.git"
   },
   "keywords": [
     "tinymce",
@@ -26,7 +26,7 @@
   "author": "Rémi Becheras <rbecheras@sirap.fr>",
   "license": "LGPL-2.1",
   "bugs": {
-    "url": "https://github.com/rbecheras/forminputs/issues"
+    "url": "https://github.com/rbecheras/tinymce-plugin-forminputs/issues"
   },
-  "homepage": "https://github.com/rbecheras/forminputs#readme"
+  "homepage": "https://github.com/rbecheras/tinymce-plugin-forminputs#readme"
 }
