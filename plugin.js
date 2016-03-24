@@ -27,12 +27,12 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     editor.fire('NodeChange');
   }
 
-  function scanCheckboxes(){
+  function updateCheckboxesClickHandlers(){
     $(':checkbox',editor.getDoc())
     .off('click').on('click',onCheckboxClick);
   }
 
-  editor.on('init change SetContent',scanCheckboxes);
+  editor.on('init change SetContent',updateCheckboxesClickHandlers);
 
   editor.addMenuItem('forminputs', {
     separator: 'before',
