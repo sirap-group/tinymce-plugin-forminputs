@@ -13,8 +13,6 @@
 tinymce.PluginManager.add('forminputs', function(editor) {
 
   function insertCheckbox(evt){
-    // console.log(evt);
-
     var body = editor.getBody();
     var selection = editor.selection.getNode();
     var inputElement = editor.dom.create('input', {type:'checkbox'});
