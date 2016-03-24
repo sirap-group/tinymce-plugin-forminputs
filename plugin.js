@@ -45,7 +45,6 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     });
   }
 
-  editor.on('init change SetContent',updateCheckboxesClickHandlers);
   var CallOnceOnTimeoutFactory = (function(){
     function CallOnceOnTimeoutFactory(timeout){
       this.timeout = timeout;
@@ -73,6 +72,12 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     };
     return CallOnceOnTimeoutFactory;
   })();
+
+  var callOnceUpdateCheckboxesClickHandler = new CallOnceOnTimeoutFactory(150);
+
+  editor.on('init NodeChange change SetContent', function(){
+    callOnceUpdateCheckboxesClickHandler.callOnce( updateCheckboxesClickHandlers );
+  });
 
   editor.addMenuItem('forminputs', {
     separator: 'before',
