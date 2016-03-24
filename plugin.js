@@ -42,6 +42,10 @@ tinymce.PluginManager.add('forminputs', function(editor) {
       text: 'Checkbox',
       onclick: insertCheckbox,
       onPostRender: null
+    },{
+      text: 'Radio buttons',
+      onclick: null,
+      onPostRender: null
     }]
   });
 
