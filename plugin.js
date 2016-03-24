@@ -20,15 +20,16 @@ tinymce.PluginManager.add('forminputs', function(editor) {
 
     editor.dom.add(labelElement,inputElement);
     editor.dom.add(selection,labelElement);
+  }
 
+  function onCheckboxClick(){
+    $(this).attr('checked',!!!$(this).attr('checked'));
+    editor.fire('NodeChange');
   }
 
   function scanCheckboxes(){
     $(':checkbox',editor.getDoc())
-    .off('click').on('click',function(){
-      $(this).attr('checked',!!!$(this).attr('checked'));
-      editor.fire('NodeChange');
-    });
+    .off('click').on('click',onCheckboxClick);
   }
 
   editor.on('init change SetContent',scanCheckboxes);
