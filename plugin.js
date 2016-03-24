@@ -46,6 +46,33 @@ tinymce.PluginManager.add('forminputs', function(editor) {
   }
 
   editor.on('init change SetContent',updateCheckboxesClickHandlers);
+  var CallOnceOnTimeoutFactory = (function(){
+    function CallOnceOnTimeoutFactory(timeout){
+      this.timeout = timeout;
+      this.launched = false;
+      this.callback = null;
+    }
+    CallOnceOnTimeoutFactory.prototype.updateCallback = function(callback){
+      this.callback = function(){
+        callback();
+      };
+    };
+    CallOnceOnTimeoutFactory.prototype.callCallback = function(){
+      this.launched = false;
+      this.callback();
+    };
+    CallOnceOnTimeoutFactory.prototype.callOnce = function(syncFn){
+      var that = this;
+      this.updateCallback(syncFn);
+      if (!this.launched) {
+        this.launched = true;
+        setTimeout(function(){
+          that.callCallback();
+        },this.timeout);
+      }
+    };
+    return CallOnceOnTimeoutFactory;
+  })();
 
   editor.addMenuItem('forminputs', {
     separator: 'before',
