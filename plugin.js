@@ -38,11 +38,11 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     separator: 'before',
     text: 'Form',
     context: 'insert',
-    menu: [
-      // {text: 'Text', onclick: null, onPostRender: null},
-      {text: 'Checkbox', onclick: insertCheckbox, onPostRender: null},
-      // {text: 'Radio buttons', onclick: null, onPostRender: null}
-    ]
+    menu: [{
+      text: 'Checkbox',
+      onclick: insertCheckbox,
+      onPostRender: null
+    }]
   });
 
 });
