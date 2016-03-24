@@ -33,6 +33,7 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     });
   }
 
+  editor.on('init change SetContent',scanCheckboxes);
 
   editor.addMenuItem('forminputs', {
     separator: 'before',
