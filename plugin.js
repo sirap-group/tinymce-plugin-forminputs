@@ -13,8 +13,6 @@
 tinymce.PluginManager.add('forminputs', function(editor) {
 
   function insertCheckbox(evt){
-    // console.log(evt);
-
     var body = editor.getBody();
     var selection = editor.selection.getNode();
     var inputElement = editor.dom.create('input', {type:'checkbox'});
@@ -22,28 +20,29 @@ tinymce.PluginManager.add('forminputs', function(editor) {
 
     editor.dom.add(labelElement,inputElement);
     editor.dom.add(selection,labelElement);
-
   }
 
-  function scanCheckboxes(){
+  function onCheckboxClick(){
+    $(this).attr('checked',!!!$(this).attr('checked'));
+    editor.fire('NodeChange');
+  }
+
+  function updateCheckboxesClickHandlers(){
     $(':checkbox',editor.getDoc())
-    .off('click').on('click',function(){
-      $(this).attr('checked',!!!$(this).attr('checked'));
-      editor.fire('NodeChange');
-    });
+    .off('click').on('click',onCheckboxClick);
   }
 
-  editor.on('init change SetContent',scanCheckboxes);
+  editor.on('init change SetContent',updateCheckboxesClickHandlers);
 
   editor.addMenuItem('forminputs', {
     separator: 'before',
     text: 'Form',
     context: 'insert',
-    menu: [
-      // {text: 'Text', onclick: null, onPostRender: null},
-      {text: 'Checkbox', onclick: insertCheckbox, onPostRender: null},
-      // {text: 'Radio buttons', onclick: null, onPostRender: null}
-    ]
+    menu: [{
+      text: 'Checkbox',
+      onclick: insertCheckbox,
+      onPostRender: null
+    }]
   });
 
 });
