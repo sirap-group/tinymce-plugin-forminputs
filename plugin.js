@@ -25,7 +25,13 @@ tinymce.PluginManager.add('forminputs', function(editor) {
 
   }
 
+  function scanCheckboxes(){
+    $(':checkbox',editor.getDoc())
+    .off('click').on('click',function(){
+      $(this).attr('checked',!!!$(this).attr('checked'));
+      editor.fire('NodeChange');
     });
+  }
 
 
   editor.addMenuItem('forminputs', {
