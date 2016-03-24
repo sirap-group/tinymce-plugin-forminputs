@@ -30,8 +30,19 @@ tinymce.PluginManager.add('forminputs', function(editor) {
   }
 
   function updateCheckboxesClickHandlers(){
-    $(':checkbox',editor.getDoc())
-    .off('click').on('click',onCheckboxClick);
+    $(':checkbox',editor.getDoc()).each(function(){
+      var box = this;
+      var parent = $(this).parent().get(0);
+      if (parent.tagName !== 'LABEL') {
+        parent = $('<label>');
+        $(this).wrap(parent);
+        console.log(parent);
+      }
+      $(parent).off('click').on('click',function(){
+        console.log('onCheckboxClick.call ...')
+        onCheckboxClick.call(box);
+      });
+    });
   }
 
   editor.on('init change SetContent',updateCheckboxesClickHandlers);
