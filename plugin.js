@@ -24,8 +24,9 @@ tinymce.PluginManager.add('forminputs', function(editor) {
   }
 
   function onCheckboxClick(){
-    $(this).attr('checked',!!!$(this).attr('checked'));
-    editor.fire('NodeChange');
+    var toggle = !!$(this).attr('checked'); console.log('toggle',toggle,!toggle);
+    $(this).attr('checked',!toggle);
+    editor.fire('change');
   }
 
   function updateCheckboxesClickHandlers(){
