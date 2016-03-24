@@ -18,8 +18,7 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     var body = editor.getBody();
     var selection = editor.selection.getNode();
     var inputElement = editor.dom.create('input', {type:'checkbox'});
-    var labelElement = editor.dom.create('label', null, 'ma case à cocher');
-
+    var labelElement = editor.dom.create('label', null, prompt('Saisir un label pour la case à chocher'));
 
     editor.dom.add(labelElement,inputElement);
     editor.dom.add(selection,labelElement);
