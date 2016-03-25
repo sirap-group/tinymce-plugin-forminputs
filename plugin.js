@@ -20,19 +20,64 @@ tinymce.PluginManager.add('forminputs', function(editor) {
 
     editor.dom.add(labelElement,inputElement);
     editor.dom.add(selection,labelElement);
+    editor.fire('change');
   }
 
   function onCheckboxClick(){
-    $(this).attr('checked',!!!$(this).attr('checked'));
-    editor.fire('NodeChange');
+    var toggle = !!$(this).attr('checked'); console.log('toggle',toggle,!toggle);
+    $(this).attr('checked',!toggle);
+    editor.fire('change');
   }
 
   function updateCheckboxesClickHandlers(){
-    $(':checkbox',editor.getDoc())
-    .off('click').on('click',onCheckboxClick);
+    $(':checkbox',editor.getDoc()).each(function(){
+      var box = this;
+      var parent = $(this).parent().get(0);
+      if (parent.tagName !== 'LABEL') {
+        parent = $('<label>');
+        $(this).wrap(parent);
+        console.log(parent);
+      }
+      $(parent).off('click').on('click',function(){
+        console.log('onCheckboxClick.call ...')
+        onCheckboxClick.call(box);
+      });
+    });
   }
 
-  editor.on('init change SetContent',updateCheckboxesClickHandlers);
+  var CallOnceOnTimeoutFactory = (function(){
+    function CallOnceOnTimeoutFactory(timeout){
+      this.timeout = timeout;
+      this.launched = false;
+      this.callback = null;
+    }
+    CallOnceOnTimeoutFactory.prototype.updateCallback = function(callback){
+      this.callback = function(){
+        callback();
+      };
+    };
+    CallOnceOnTimeoutFactory.prototype.callCallback = function(){
+      this.launched = false;
+      this.callback();
+    };
+    CallOnceOnTimeoutFactory.prototype.callOnce = function(syncFn){
+      var that = this;
+      this.updateCallback(syncFn);
+      if (!this.launched) {
+        this.launched = true;
+        setTimeout(function(){
+          that.callCallback();
+        },this.timeout);
+      }
+    };
+    return CallOnceOnTimeoutFactory;
+  })();
+
+  var callOnceUpdateCheckboxesClickHandler = new CallOnceOnTimeoutFactory(150);
+
+  editor.on('init NodeChange change SetContent', function(){
+    callOnceUpdateCheckboxesClickHandler.callOnce( updateCheckboxesClickHandlers );
+  });
 
   editor.addMenuItem('forminputs', {
     separator: 'before',
