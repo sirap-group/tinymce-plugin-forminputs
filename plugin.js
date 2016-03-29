@@ -20,7 +20,8 @@ tinymce.PluginManager.add('forminputs', function(editor) {
 
     editor.dom.add(labelElement,inputElement);
     editor.dom.add(selection,labelElement);
-    editor.fire('change');
+    // editor.fire('change');
+    editor.nodeChanged();
   }
 
   function onCheckboxClick(){
