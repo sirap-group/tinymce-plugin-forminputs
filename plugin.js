@@ -58,15 +58,19 @@ tinymce.PluginManager.add('forminputs', function(editor) {
   }
 
   var CallOnceOnTimeoutFactory = (function(){
-    function CallOnceOnTimeoutFactory(timeout){
+    function CallOnceOnTimeoutFactory(timeout,updateFunction){
       this.timeout = timeout;
       this.launched = false;
       this.callback = null;
+
+      // set or update the callback but don't update it if `updateFunction` is set to false.
+      if (updateFunction === undefined) this.updateFunction = true;
+      else this.updateFunction = updateFunction;
+
+      console.log('this.updateFunction',this.updateFunction);
     }
     CallOnceOnTimeoutFactory.prototype.updateCallback = function(callback){
-      this.callback = function(){
-        callback();
-      };
+      this.callback = callback;
     };
     CallOnceOnTimeoutFactory.prototype.callCallback = function(){
       this.launched = false;
@@ -74,7 +78,7 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     };
     CallOnceOnTimeoutFactory.prototype.callOnce = function(syncFn){
       var that = this;
-      this.updateCallback(syncFn);
+      if (this.updateFunction || this.callback === null) this.updateCallback(syncFn);
       if (!this.launched) {
         this.launched = true;
         setTimeout(function(){
