@@ -49,12 +49,10 @@ tinymce.PluginManager.add('forminputs', function(editor) {
       var parent = $(this).parent().get(0);
       if (parent.tagName !== 'LABEL') {
         parent = $('<label>');
-        $(this).wrap(parent);
-        console.log(parent);
+        $(box).wrap(parent);
       }
-      $(parent).off('click').on('click',function(){
-        console.log('onCheckboxClick.call ...')
-        onCheckboxClick.call(box);
+      $(parent).off('click').on('click',function(evt){
+        onCheckboxClick.call(box,evt);
       });
     });
   }
