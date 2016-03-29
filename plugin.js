@@ -24,10 +24,23 @@ tinymce.PluginManager.add('forminputs', function(editor) {
     editor.nodeChanged();
   }
 
-  function onCheckboxClick(){
-    var toggle = !!$(this).attr('checked'); console.log('toggle',toggle,!toggle);
-    $(this).attr('checked',!toggle);
+  function onCheckboxClick(evt){
+    evt.preventDefault();
+
+    console.log(this,evt);
+
+    var thisBox = $(this);
+    var toggle = !!thisBox.attr('checked');
+    var clone = thisBox.clone();
+    console.log('toggle',toggle,!toggle);
+
+
+    clone.attr('checked',!toggle);
+    clone.insertAfter(thisBox);
+    thisBox.remove();
+    editor.nodeChanged();
     editor.fire('change');
+    editor.fire('SetContent');
   }
 
   function updateCheckboxesClickHandlers(){
