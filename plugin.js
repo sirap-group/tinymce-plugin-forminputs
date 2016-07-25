@@ -54,6 +54,8 @@
       callOnceUpdateCheckboxesClickHandler.callOnce(updateCheckboxesClickHandlers)
     })
 
+    editor.on('init', disableContentEditableToAllLabels)
+
     editor.addMenuItem('forminputs', {
       separator: 'before',
       text: 'Form',
@@ -107,6 +109,25 @@
           onCheckboxClick.call(box, evt)
         })
       })
+    }
+
+    function disableContentEditableToAllLabels (evt) {
+      setTimeout(searchAndDisable, 200)
+
+      function searchAndDisable () {
+        // all checkboxes
+        var $checkboxes = $('input[type=checkbox]', editor.getDoc())
+
+        // disabled label wrapped ones
+        $checkboxes.filter(function () {
+          return $(this).parent()[0].nodeName === 'LABEL'
+        }).parent().attr('contenteditable', false)
+
+        // wrap and disable the unwrapped ones
+        $checkboxes.filter(function () {
+          return $(this).parent()[0].nodeName !== 'LABEL'
+        }).wrap($('label').attr('contenteditable', false))
+      }
     }
   })
 })(window)
