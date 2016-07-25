@@ -21,7 +21,7 @@
       var selection = editor.selection.getNode()
       var inputElement = editor.dom.create('input', {type: 'checkbox'})
       var labelElement = editor.dom.create('label', null, prompt('Saisir un label pour la case à chocher'))
-
+      editor.dom.setAttrib(labelElement, 'contenteditable', false)
       editor.dom.add(labelElement, inputElement)
       editor.dom.add(selection, labelElement)
       // editor.fire('change')
