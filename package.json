@@ -1,6 +1,6 @@
 {
   "name": "tinymce-plugin-forminputs",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A plugin for tinymce WYSIWYG HTML editor that allow to insert editable HTML form inputs.",
   "main": "plugin.js",
   "devDependencies": {
@@ -8,6 +8,7 @@
     "grunt-bump": "^0.6.0",
     "grunt-contrib-jshint": "^0.11.3",
     "grunt-contrib-uglify": "^0.10.0",
+    "grunt-standard": "^2.0.0",
     "load-grunt-tasks": "^3.3.0"
   },
   "scripts": {
@@ -21,7 +22,13 @@
   "keywords": [
     "tinymce",
     "plugin",
-    "forms"," inputs"," form inputs"," checkbox"," radio"," textarea","label"
+    "forms",
+    " inputs",
+    " form inputs",
+    " checkbox",
+    " radio",
+    " textarea",
+    "label"
   ],
   "author": "Rémi Becheras <rbecheras@sirap.fr>",
   "license": "LGPL-2.1",
