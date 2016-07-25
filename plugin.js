@@ -16,50 +16,6 @@
   var tinymce = window.tinymce
 
   tinymce.PluginManager.add('forminputs', function (editor) {
-    function insertCheckbox (evt) {
-      // var body = editor.getBody()
-      var selection = editor.selection.getNode()
-      var inputElement = editor.dom.create('input', {type: 'checkbox'})
-      var labelElement = editor.dom.create('label', null, prompt('Saisir un label pour la case à chocher'))
-      editor.dom.setAttrib(labelElement, 'contenteditable', false)
-      editor.dom.add(labelElement, inputElement)
-      editor.dom.add(selection, labelElement)
-      // editor.fire('change')
-      editor.nodeChanged()
-    }
-
-    function onCheckboxClick (evt) {
-      evt.preventDefault()
-
-      console.log(this, evt)
-
-      var thisBox = $(this)
-      var toggle = !!thisBox.attr('checked')
-      var clone = thisBox.clone()
-      console.log('toggle', toggle, !toggle)
-
-      clone.attr('checked', !toggle)
-      clone.insertAfter(thisBox)
-      thisBox.remove()
-      editor.nodeChanged()
-      editor.fire('change')
-      editor.fire('SetContent')
-    }
-
-    function updateCheckboxesClickHandlers () {
-      $(':checkbox', editor.getDoc()).each(function () {
-        var box = this
-        var parent = $(this).parent().get(0)
-        if (parent.tagName !== 'LABEL') {
-          parent = $('<label>')
-          $(box).wrap(parent)
-        }
-        $(parent).off('click').on('click', function (evt) {
-          onCheckboxClick.call(box, evt)
-        })
-      })
-    }
-
     var CallOnceOnTimeoutFactory = (function () {
       function CallOnceOnTimeoutFactory (timeout, updateFunction) {
         this.timeout = timeout
@@ -108,5 +64,49 @@
         onPostRender: null
       }]
     })
+
+    function insertCheckbox (evt) {
+      // var body = editor.getBody()
+      var selection = editor.selection.getNode()
+      var inputElement = editor.dom.create('input', {type: 'checkbox'})
+      var labelElement = editor.dom.create('label', null, prompt('Saisir un label pour la case à chocher'))
+      editor.dom.setAttrib(labelElement, 'contenteditable', false)
+      editor.dom.add(labelElement, inputElement)
+      editor.dom.add(selection, labelElement)
+      // editor.fire('change')
+      editor.nodeChanged()
+    }
+
+    function onCheckboxClick (evt) {
+      evt.preventDefault()
+
+      console.log(this, evt)
+
+      var thisBox = $(this)
+      var toggle = !!thisBox.attr('checked')
+      var clone = thisBox.clone()
+      console.log('toggle', toggle, !toggle)
+
+      clone.attr('checked', !toggle)
+      clone.insertAfter(thisBox)
+      thisBox.remove()
+      editor.nodeChanged()
+      editor.fire('change')
+      editor.fire('SetContent')
+    }
+
+    function updateCheckboxesClickHandlers () {
+      $(':checkbox', editor.getDoc()).each(function () {
+        var box = this
+        var parent = $(this).parent().get(0)
+        if (parent.tagName !== 'LABEL') {
+          parent = $('<label>')
+          $(box).wrap(parent)
+        }
+        $(parent).off('click').on('click', function (evt) {
+          onCheckboxClick.call(box, evt)
+        })
+      })
+    }
   })
 })(window)
