@@ -79,15 +79,26 @@
     })
 
     function insertCheckbox (evt) {
-      var inputId = 'input-checkbox-' + Date.now()
       // var body = editor.getBody()
       var selection = editor.selection.getNode()
+
+      // create the input element
       var inputElement = editor.dom.create('input', {type: 'checkbox'})
+      var $inputElement = $(inputElement)
+
+      // ask the user for what he wants to do
       var labelText = prompt('Saisir un label pour la case à chocher')
       var isLabelBeforeBox = confirm('Voulez-vous placer le label avant la case (annuler pour le placer après) ?')
+
+      // create the label element
       var labelElement = editor.dom.create('label', null)
-      $(labelElement).attr('for', inputId)
-      $(inputElement).attr('id', inputId)
+      var $labelElement = $(labelElement)
+
+      // define the input ID to associate the label with
+      var inputId = 'input-checkbox-' + Date.now()
+      $labelElement.attr('for', inputId)
+      $labelElement.attr('id', inputId)
+
       // search the closest font family and size
       var selectedNode = editor.selection.getNode()
       var closestFontConfig = getClosestNodeWithFontConfig(selectedNode, 'Calibri', '12pt', editor)
@@ -101,11 +112,15 @@
 
       editor.dom.setAttrib(labelElement, 'contenteditable', false)
       if (isLabelBeforeBox) {
-        $(inputElement).appendTo(labelElement)
+        $inputElement.appendTo(labelElement)
       } else {
-        $(inputElement).prependTo(labelElement)
+        $inputElement.prependTo(labelElement)
       }
+
+      // append elements to the document
       editor.dom.add(selection, labelElement)
+
+      // render the changes
       // editor.fire('change')
       editor.nodeChanged()
     }
