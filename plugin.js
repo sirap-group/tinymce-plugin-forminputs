@@ -125,7 +125,7 @@
       // define the input ID to associate the label with
       var inputId = 'input-checkbox-' + Date.now()
       $labelElement.attr('for', inputId)
-      $labelElement.attr('id', inputId)
+      $inputElement.attr('id', inputId)
 
       // search the closest font family and size
       var selectedNode = editor.selection.getNode()
