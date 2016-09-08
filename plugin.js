@@ -12,6 +12,7 @@
   'use strict'
 
   var prompt = window.prompt
+  var confirm = window.confirm
   var $ = window.$
   var tinymce = window.tinymce
 
@@ -81,9 +82,15 @@
       // var body = editor.getBody()
       var selection = editor.selection.getNode()
       var inputElement = editor.dom.create('input', {type: 'checkbox'})
-      var labelElement = editor.dom.create('label', null, prompt('Saisir un label pour la case à chocher'))
+      var labelText = prompt('Saisir un label pour la case à chocher')
+      var isLabelBeforeBox = confirm('Voulez-vous placer le label avant la case (annuler pour le placer après) ?')
+      var labelElement = editor.dom.create('label', null, labelText)
       editor.dom.setAttrib(labelElement, 'contenteditable', false)
-      editor.dom.add(labelElement, inputElement)
+      if (isLabelBeforeBox) {
+        $(inputElement).appendTo(labelElement)
+      } else {
+        $(inputElement).prependTo(labelElement)
+      }
       editor.dom.add(selection, labelElement)
       // editor.fire('change')
       editor.nodeChanged()
