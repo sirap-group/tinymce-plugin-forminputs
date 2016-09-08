@@ -115,16 +115,11 @@
       evt.stopPropagation()
 
       var $thisBox = $(this)
-      var toggle = !!$thisBox.attr('checked')
-
-      toggle = !toggle
-      $thisBox.hide()
-      if (toggle) {
+      if ($thisBox.attr('checked')) {
         $thisBox.attr('checked', 'checked')
       } else {
         $thisBox.removeAttr('checked')
       }
-      $thisBox.show()
 
       // hotfix !
       // without that, the checkbox rendering never switch to "checked" even if
