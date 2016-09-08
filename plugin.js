@@ -115,7 +115,7 @@
       evt.stopPropagation()
 
       var $thisBox = $(this)
-      if ($thisBox.attr('checked')) {
+      if (!$thisBox.attr('checked')) {
         $thisBox.attr('checked', 'checked')
       } else {
         $thisBox.removeAttr('checked')
