@@ -79,12 +79,26 @@
     })
 
     function insertCheckbox (evt) {
+      var inputId = 'input-checkbox-' + Date.now()
       // var body = editor.getBody()
       var selection = editor.selection.getNode()
       var inputElement = editor.dom.create('input', {type: 'checkbox'})
       var labelText = prompt('Saisir un label pour la case à chocher')
       var isLabelBeforeBox = confirm('Voulez-vous placer le label avant la case (annuler pour le placer après) ?')
-      var labelElement = editor.dom.create('label', null, labelText)
+      var labelElement = editor.dom.create('label', null)
+      $(labelElement).attr('for', inputId)
+      $(inputElement).attr('id', inputId)
+      // search the closest font family and size
+      var selectedNode = editor.selection.getNode()
+      var closestFontConfig = getClosestNodeWithFontConfig(selectedNode, 'Calibri', '12pt', editor)
+      // create the span element to wrap the label text into the label element
+      var labelSpanElement = $('<span>')
+      .html(labelText)
+      .attr('contenteditable', false)
+      .css(closestFontConfig)
+      // and append it to the label element
+      labelSpanElement.appendTo(labelElement)
+
       editor.dom.setAttrib(labelElement, 'contenteditable', false)
       if (isLabelBeforeBox) {
         $(inputElement).appendTo(labelElement)
@@ -98,20 +112,24 @@
 
     function onCheckboxClick (evt) {
       evt.preventDefault()
+      evt.stopPropagation()
 
-      console.log(this, evt)
+      var $thisBox = $(this)
+      var toggle = !!$thisBox.attr('checked')
 
-      var thisBox = $(this)
-      var toggle = !!thisBox.attr('checked')
-      var clone = thisBox.clone()
-      console.log('toggle', toggle, !toggle)
+      toggle = !toggle
+      $thisBox.hide()
+      if (toggle) {
+        $thisBox.attr('checked', 'checked')
+      } else {
+        $thisBox.removeAttr('checked')
+      }
+      $thisBox.show()
 
-      clone.attr('checked', !toggle)
-      clone.insertAfter(thisBox)
-      thisBox.remove()
-      editor.nodeChanged()
-      editor.fire('change')
-      editor.fire('SetContent')
+      // hotfix !
+      // without that, the checkbox rendering never switch to "checked" even if
+      // it is in the DOM
+      editor.setContent(editor.getContent())
     }
 
     function updateCheckboxesClickHandlers () {
