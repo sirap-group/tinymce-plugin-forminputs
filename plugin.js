@@ -158,6 +158,12 @@
       evt.stopPropagation()
 
       var $thisBox = $(this)
+
+      // don't allow box toggle if the input is disabled, leave the function
+      if ($thisBox.attr('disabled') === 'disabled') {
+        return
+      }
+
       if (!$thisBox.attr('checked')) {
         $thisBox.attr('checked', 'checked')
       } else {
