@@ -85,6 +85,7 @@
       // create the input element
       var inputElement = editor.dom.create('input', {type: 'checkbox'})
       var $inputElement = $(inputElement)
+      inputElement.indeterminate = true
 
       // ask the user for what he wants to do
       var labelText = prompt('Saisir un label pour la case à chocher')
