@@ -59,6 +59,15 @@
   }
 
   function forminputsPlugin (editor) {
+    var isMergeFieldBindingEnabled = false
+
+    // exports enableMergeFieldBinding method to the plugin API
+    // example of usage:
+    // editor.plugins.forminputs.enableMergeFieldBinding() // to enable mergeField/checkbox bindings
+    this.enableMergeFieldBinding = enableMergeFieldBinding.bind(this, true)
+    // editor.plugins.forminputs.disableMergeFieldBinding() // to disable mergeField/checkbox bindings
+    this.disableMergeFieldBinding = enableMergeFieldBinding.bind(this, false)
+
     var callOnceUpdateCheckboxesClickHandler = new CallOnceOnTimeoutFactory(150)
 
     editor.on('init NodeChange change SetContent', function () {
@@ -77,6 +86,11 @@
         onPostRender: null
       }]
     })
+
+    function enableMergeFieldBinding (enabling) {
+      console.info('Binding of merge fields and checkbox values enabled')
+      isMergeFieldBindingEnabled = !!enabling
+    }
 
     function insertCheckbox (evt) {
       // var body = editor.getBody()
