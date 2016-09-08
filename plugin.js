@@ -102,8 +102,21 @@
       inputElement.indeterminate = true
 
       // ask the user for what he wants to do
+      var isLockedForMergeFields, mergeFieldCode
       var labelText = prompt('Saisir un label pour la case à chocher')
-      var isLabelBeforeBox = confirm('Voulez-vous placer le label avant la case (annuler pour le placer après) ?')
+      var isLabelBeforeBox = confirm('Voulez-vous placer la case devant le label ?')
+      if (isMergeFieldBindingEnabled) {
+        isLockedForMergeFields = confirm('Voulez-vous que cette case à cocher soit vérouillée par un champ de fusion ?')
+        if (isLockedForMergeFields) {
+          mergeFieldCode = prompt('Quel est le code du champ de fusion a associer ?')
+        }
+      }
+
+      // locks the checkbox for merge field binding if wanted
+      if (isLockedForMergeFields) {
+        $inputElement.attr('disabled', 'disabled')
+        $inputElement.attr('data-merge-field-code', mergeFieldCode)
+      }
 
       // create the label element
       var labelElement = editor.dom.create('label', null)
