@@ -15,39 +15,49 @@
   var $ = window.$
   var tinymce = window.tinymce
 
-  tinymce.PluginManager.add('forminputs', function (editor) {
-    var CallOnceOnTimeoutFactory = (function () {
-      function CallOnceOnTimeoutFactory (timeout, updateFunction) {
-        this.timeout = timeout
-        this.launched = false
-        this.callback = null
+  tinymce.PluginManager.add('forminputs', forminputsPlugin)
 
-        // set or update the callback but don't update it if `updateFunction` is set to false.
-        if (updateFunction === undefined) this.updateFunction = true
-        else this.updateFunction = updateFunction
+  var CallOnceOnTimeoutFactory = createCallOnceOnTimeoutFactory()
 
-        console.log('this.updateFunction', this.updateFunction)
-      }
-      CallOnceOnTimeoutFactory.prototype.updateCallback = function (callback) {
-        this.callback = callback
-      }
-      CallOnceOnTimeoutFactory.prototype.callCallback = function () {
-        this.launched = false
-        this.callback()
-      }
-      CallOnceOnTimeoutFactory.prototype.callOnce = function (syncFn) {
-        var that = this
-        if (this.updateFunction || this.callback === null) this.updateCallback(syncFn)
-        if (!this.launched) {
-          this.launched = true
-          setTimeout(function () {
-            that.callCallback()
-          }, this.timeout)
-        }
-      }
-      return CallOnceOnTimeoutFactory
-    })()
+  function createCallOnceOnTimeoutFactory () {
+    function CallOnceOnTimeoutFactory (timeout, updateFunction) {
+      this.timeout = timeout
+      this.launched = false
+      this.callback = null
 
+      // set or update the callback but don't update it if `updateFunction` is set to false.
+      if (updateFunction === undefined) this.updateFunction = true
+      else this.updateFunction = updateFunction
+
+      console.log('this.updateFunction', this.updateFunction)
+    }
+
+    CallOnceOnTimeoutFactory.prototype.updateCallback = updateCallback
+    CallOnceOnTimeoutFactory.prototype.callCallback = callCallback
+    CallOnceOnTimeoutFactory.prototype.callOnce = callOnce
+
+    return CallOnceOnTimeoutFactory
+
+    function updateCallback (callback) {
+      this.callback = callback
+    }
+    function callCallback () {
+      this.launched = false
+      this.callback()
+    }
+    function callOnce (syncFn) {
+      var that = this
+      if (this.updateFunction || this.callback === null) this.updateCallback(syncFn)
+      if (!this.launched) {
+        this.launched = true
+        setTimeout(function () {
+          that.callCallback()
+        }, this.timeout)
+      }
+    }
+  }
+
+  function forminputsPlugin (editor) {
     var callOnceUpdateCheckboxesClickHandler = new CallOnceOnTimeoutFactory(150)
 
     editor.on('init NodeChange change SetContent', function () {
@@ -129,5 +139,5 @@
         }).wrap($('label').attr('contenteditable', false))
       }
     }
-  })
+  }
 })(window)
