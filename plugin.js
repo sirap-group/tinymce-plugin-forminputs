@@ -118,8 +118,9 @@
 
       // locks the checkbox for merge field binding if wanted
       if (isLockedForMergeFields) {
-        $inputElement.attr('disabled', 'disabled')
+        // $inputElement.attr('disabled', 'disabled')
         $inputElement.attr('data-merge-field-code', mergeFieldCode)
+        $labelElement.addClass('disabled-element')
       }
 
       // define the input ID to associate the label with
@@ -159,8 +160,8 @@
 
       var $thisBox = $(this)
 
-      // don't allow box toggle if the input is disabled, leave the function
-      if ($thisBox.attr('disabled') === 'disabled') {
+      // don't toggle the checkbox if it should be disabled, leave the function
+      if ($thisBox.attr('data-merge-field-code')) {
         return
       }
 
