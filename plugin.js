@@ -101,6 +101,10 @@
       var $inputElement = $(inputElement)
       inputElement.indeterminate = true
 
+      // create the label element
+      var labelElement = editor.dom.create('label', null)
+      var $labelElement = $(labelElement)
+
       // ask the user for what he wants to do
       var isLockedForMergeFields, mergeFieldCode
       var labelText = prompt('Saisir un label pour la case à chocher')
@@ -117,10 +121,6 @@
         $inputElement.attr('disabled', 'disabled')
         $inputElement.attr('data-merge-field-code', mergeFieldCode)
       }
-
-      // create the label element
-      var labelElement = editor.dom.create('label', null)
-      var $labelElement = $(labelElement)
 
       // define the input ID to associate the label with
       var inputId = 'input-checkbox-' + Date.now()
