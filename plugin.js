@@ -156,7 +156,6 @@
 
     function onCheckboxClick (evt) {
       evt.preventDefault()
-      evt.stopPropagation()
 
       var $thisBox = $(this)
 
