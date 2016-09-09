@@ -12,41 +12,61 @@
   'use strict'
 
   var prompt = window.prompt
+  var confirm = window.confirm
   var $ = window.$
   var tinymce = window.tinymce
 
-  tinymce.PluginManager.add('forminputs', function (editor) {
-    var CallOnceOnTimeoutFactory = (function () {
-      function CallOnceOnTimeoutFactory (timeout, updateFunction) {
-        this.timeout = timeout
-        this.launched = false
-        this.callback = null
+  tinymce.PluginManager.add('forminputs', forminputsPlugin)
 
-        // set or update the callback but don't update it if `updateFunction` is set to false.
-        if (updateFunction === undefined) this.updateFunction = true
-        else this.updateFunction = updateFunction
+  var CallOnceOnTimeoutFactory = createCallOnceOnTimeoutFactory()
 
-        console.log('this.updateFunction', this.updateFunction)
+  function createCallOnceOnTimeoutFactory () {
+    function CallOnceOnTimeoutFactory (timeout, updateFunction) {
+      this.timeout = timeout
+      this.launched = false
+      this.callback = null
+
+      // set or update the callback but don't update it if `updateFunction` is set to false.
+      if (updateFunction === undefined) this.updateFunction = true
+      else this.updateFunction = updateFunction
+
+      console.log('this.updateFunction', this.updateFunction)
+    }
+
+    CallOnceOnTimeoutFactory.prototype.updateCallback = updateCallback
+    CallOnceOnTimeoutFactory.prototype.callCallback = callCallback
+    CallOnceOnTimeoutFactory.prototype.callOnce = callOnce
+
+    return CallOnceOnTimeoutFactory
+
+    function updateCallback (callback) {
+      this.callback = callback
+    }
+    function callCallback () {
+      this.launched = false
+      this.callback()
+    }
+    function callOnce (syncFn) {
+      var that = this
+      if (this.updateFunction || this.callback === null) this.updateCallback(syncFn)
+      if (!this.launched) {
+        this.launched = true
+        setTimeout(function () {
+          that.callCallback()
+        }, this.timeout)
       }
-      CallOnceOnTimeoutFactory.prototype.updateCallback = function (callback) {
-        this.callback = callback
-      }
-      CallOnceOnTimeoutFactory.prototype.callCallback = function () {
-        this.launched = false
-        this.callback()
-      }
-      CallOnceOnTimeoutFactory.prototype.callOnce = function (syncFn) {
-        var that = this
-        if (this.updateFunction || this.callback === null) this.updateCallback(syncFn)
-        if (!this.launched) {
-          this.launched = true
-          setTimeout(function () {
-            that.callCallback()
-          }, this.timeout)
-        }
-      }
-      return CallOnceOnTimeoutFactory
-    })()
+    }
+  }
+
+  function forminputsPlugin (editor) {
+    var isMergeFieldBindingEnabled = false
+
+    // exports enableMergeFieldBinding method to the plugin API
+    // example of usage:
+    // editor.plugins.forminputs.enableMergeFieldBinding() // to enable mergeField/checkbox bindings
+    this.enableMergeFieldBinding = enableMergeFieldBinding.bind(this, true)
+    // editor.plugins.forminputs.disableMergeFieldBinding() // to disable mergeField/checkbox bindings
+    this.disableMergeFieldBinding = enableMergeFieldBinding.bind(this, false)
 
     var callOnceUpdateCheckboxesClickHandler = new CallOnceOnTimeoutFactory(150)
 
@@ -67,14 +87,70 @@
       }]
     })
 
+    function enableMergeFieldBinding (enabling) {
+      console.info('Binding of merge fields and checkbox values enabled')
+      isMergeFieldBindingEnabled = !!enabling
+    }
+
     function insertCheckbox (evt) {
       // var body = editor.getBody()
       var selection = editor.selection.getNode()
+
+      // create the input element
       var inputElement = editor.dom.create('input', {type: 'checkbox'})
-      var labelElement = editor.dom.create('label', null, prompt('Saisir un label pour la case à chocher'))
+      var $inputElement = $(inputElement)
+      inputElement.indeterminate = true
+
+      // create the label element
+      var labelElement = editor.dom.create('label', null)
+      var $labelElement = $(labelElement)
+
+      // ask the user for what he wants to do
+      var isLockedForMergeFields, mergeFieldCode
+      var labelText = prompt('Saisir un label pour la case à chocher')
+      var isLabelBeforeBox = confirm('Voulez-vous placer la case devant le label ?')
+      if (isMergeFieldBindingEnabled) {
+        isLockedForMergeFields = confirm('Voulez-vous que cette case à cocher soit vérouillée par un champ de fusion ?')
+        if (isLockedForMergeFields) {
+          mergeFieldCode = prompt('Quel est le code du champ de fusion a associer ?')
+        }
+      }
+
+      // locks the checkbox for merge field binding if wanted
+      if (isLockedForMergeFields) {
+        // $inputElement.attr('disabled', 'disabled')
+        $inputElement.attr('data-merge-field-code', mergeFieldCode)
+        $labelElement.addClass('disabled-element')
+      }
+
+      // define the input ID to associate the label with
+      var inputId = 'input-checkbox-' + Date.now()
+      $labelElement.attr('for', inputId)
+      $inputElement.attr('id', inputId)
+
+      // search the closest font family and size
+      var selectedNode = editor.selection.getNode()
+      // var $selectedNode = $(selectedNode)
+      var closestFontConfig = getClosestNodeWithFontConfig(selectedNode, 'Calibri', '12pt', editor)
+      // create the span element to wrap the label text into the label element
+      var $labelSpanWrapper = $('<span>')
+      .html(labelText)
+      .attr('contenteditable', false)
+      .css(closestFontConfig)
+      // and append it to the label element
+      $labelSpanWrapper.appendTo($labelElement)
+
       editor.dom.setAttrib(labelElement, 'contenteditable', false)
-      editor.dom.add(labelElement, inputElement)
+      if (isLabelBeforeBox) {
+        $inputElement.appendTo(labelElement)
+      } else {
+        $inputElement.prependTo(labelElement)
+      }
+
+      // append elements to the document
       editor.dom.add(selection, labelElement)
+
+      // render the changes
       // editor.fire('change')
       editor.nodeChanged()
     }
@@ -82,19 +158,31 @@
     function onCheckboxClick (evt) {
       evt.preventDefault()
 
-      console.log(this, evt)
+      var $thisBox = $(this)
 
-      var thisBox = $(this)
-      var toggle = !!thisBox.attr('checked')
-      var clone = thisBox.clone()
-      console.log('toggle', toggle, !toggle)
+      // don't toggle the checkbox if it should be disabled, leave the function
+      if ($thisBox.attr('data-merge-field-code')) {
+        return
+      }
 
-      clone.attr('checked', !toggle)
-      clone.insertAfter(thisBox)
-      thisBox.remove()
-      editor.nodeChanged()
-      editor.fire('change')
-      editor.fire('SetContent')
+      if (!$thisBox.attr('checked')) {
+        $thisBox.attr('checked', 'checked')
+      } else {
+        $thisBox.removeAttr('checked')
+      }
+
+      // hotfix !
+      // without that, the checkbox rendering never switch to "checked" even if
+      // it is in the DOM
+      editor.setContent(editor.getContent())
+      editor.focus()
+
+      // choose the correct element to focus on (label or input)
+      var $newBox = $('#' + $thisBox.attr('id'), editor.getDoc())
+      var $label = $newBox.parent('label')
+      var focusNode = (!$label.length) ? $label.get(0) : $newBox.get(0)
+      editor.selection.select(focusNode)
+      editor.selection.collapse(true)
     }
 
     function updateCheckboxesClickHandlers () {
@@ -129,5 +217,91 @@
         }).wrap($('label').attr('contenteditable', false))
       }
     }
-  })
+  }
+
+  /**
+   * @typedef FontConfig
+   * @type object
+   * @property {string} fontFamily The font-family name
+   * @property {string} fontSize The font-size with unit (ex: "12pt")
+   */
+
+  /**
+   * Search the closest span element for wich font size and family is defined. Begins with previous, then next, and finally search through the ancestors and their children
+   * @function
+   * @param {DOMNode} the node from wich the search starts
+   * @returns {null|FontConfig}
+   */
+  function getClosestNodeWithFontConfig (node, defaultFamily, defaultSize, editor) {
+    var $node = $(node)
+    var $currentNode
+    var found, $found
+
+    // is node ok itself ?
+    $currentNode = $node.filter(fontConfigFilter)
+    if ($currentNode.length) {
+      $found = $currentNode
+    } else {
+      var $allNodes = $('*', editor.getDoc())
+      var nodePosition = $allNodes.index(node)
+
+      var $allSpans = $('span', editor.getDoc()).filter(fontConfigFilter)
+      var allSpanPositions = $allSpans.map(function (i, el) {
+        return $allNodes.index(el)
+      })
+
+      var lowerPositions = []
+      var greaterPositions = []
+      $.each(allSpanPositions, function (i, documentPosition) {
+        if (documentPosition < nodePosition) {
+          lowerPositions.push(documentPosition)
+        } else if (documentPosition > nodePosition) {
+          greaterPositions.push(documentPosition)
+        }
+      })
+
+      var prevIndex = Math.max.apply(null, lowerPositions)
+      var nextIndex = Math.min.apply(null, greaterPositions)
+
+      if (!isNaN(prevIndex) && isFinite(prevIndex)) {
+        found = $allNodes[prevIndex]
+      } else if (!isNaN(nextIndex) && isFinite(nextIndex)) {
+        found = $allNodes[nextIndex]
+      }
+      if (found) {
+        $found = $(found)
+      }
+    }
+
+    if ($found) {
+      return getConfigFromElement($found)
+    } else {
+      return {
+        fontFamily: defaultFamily,
+        fontSize: defaultSize
+      }
+    }
+  }
+
+  /**
+   * A jquery filter to filter span elements having fontFamily and fontSize defined
+   * @function
+   * @returns {boolean} true|false
+   */
+  function fontConfigFilter () {
+    return (this.style.fontFamily && this.style.fontSize)
+  }
+
+  /**
+   * A handy function to return a FontConfig type object from the element styles values
+   * @function
+   * @param {jQuery} $element A jQuery object from the element to lookup the font style rules
+   * @returns {FontConfig} the resulting fontConfig object
+   */
+  function getConfigFromElement ($element) {
+    return {
+      fontFamily: $element[0].style.fontFamily,
+      fontSize: $element[0].style.fontSize
+    }
+  }
 })(window)
