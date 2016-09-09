@@ -130,14 +130,15 @@
 
       // search the closest font family and size
       var selectedNode = editor.selection.getNode()
+      // var $selectedNode = $(selectedNode)
       var closestFontConfig = getClosestNodeWithFontConfig(selectedNode, 'Calibri', '12pt', editor)
       // create the span element to wrap the label text into the label element
-      var labelSpanElement = $('<span>')
+      var $labelSpanWrapper = $('<span>')
       .html(labelText)
       .attr('contenteditable', false)
       .css(closestFontConfig)
       // and append it to the label element
-      labelSpanElement.appendTo(labelElement)
+      $labelSpanWrapper.appendTo($labelElement)
 
       editor.dom.setAttrib(labelElement, 'contenteditable', false)
       if (isLabelBeforeBox) {
@@ -174,6 +175,14 @@
       // without that, the checkbox rendering never switch to "checked" even if
       // it is in the DOM
       editor.setContent(editor.getContent())
+      editor.focus()
+
+      // choose the correct element to focus on (label or input)
+      var $newBox = $('#' + $thisBox.attr('id'), editor.getDoc())
+      var $label = $newBox.parent('label')
+      var focusNode = (!$label.length) ? $label.get(0) : $newBox.get(0)
+      editor.selection.select(focusNode)
+      editor.selection.collapse(true)
     }
 
     function updateCheckboxesClickHandlers () {
