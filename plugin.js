@@ -82,7 +82,9 @@
       context: 'insert',
       menu: [{
         text: 'Checkbox',
-        onclick: insertCheckbox,
+        onclick: function (e) {
+          editor.undoManager.transact(insertCheckbox)
+        },
         onPostRender: null
       }]
     })
@@ -92,7 +94,7 @@
       isMergeFieldBindingEnabled = !!enabling
     }
 
-    function insertCheckbox (evt) {
+    function insertCheckbox () {
       // var body = editor.getBody()
       var selection = editor.selection.getNode()
 
@@ -149,10 +151,6 @@
 
       // append elements to the document
       editor.dom.add(selection, labelElement)
-
-      // render the changes
-      // editor.fire('change')
-      editor.nodeChanged()
     }
 
     function onCheckboxClick (evt) {
@@ -194,7 +192,7 @@
           $(box).wrap(parent)
         }
         $(parent).off('click').on('click', function (evt) {
-          onCheckboxClick.call(box, evt)
+          editor.undoManager.transact(onCheckboxClick.bind(box, evt))
         })
       })
     }
