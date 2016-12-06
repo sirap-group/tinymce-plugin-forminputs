@@ -192,7 +192,7 @@
           $(box).wrap(parent)
         }
         $(parent).off('click').on('click', function (evt) {
-          onCheckboxClick.call(box, evt)
+          editor.undoManager.transact(onCheckboxClick.bind(box, evt))
         })
       })
     }
